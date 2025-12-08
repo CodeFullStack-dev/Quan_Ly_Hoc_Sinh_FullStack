@@ -1,13 +1,13 @@
-package com.example.quan_ly_hoc_sinh;
+package com.example.Quan_Ly_Hoc_Sinh_Backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class QuanLyHocSinhApplication {
+public class QuanLyHocSinhBackendApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(QuanLyHocSinhApplication.class, args);
+		SpringApplication.run(QuanLyHocSinhBackendApplication.class, args);
 	}
 
 }

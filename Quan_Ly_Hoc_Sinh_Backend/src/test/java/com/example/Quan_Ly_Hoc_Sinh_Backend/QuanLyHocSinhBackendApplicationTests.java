@@ -1,10 +1,10 @@
-package com.example.quan_ly_hoc_sinh;
+package com.example.Quan_Ly_Hoc_Sinh_Backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class QuanLyHocSinhApplicationTests {
+class QuanLyHocSinhBackendApplicationTests {
 
 	@Test
 	void contextLoads() {
