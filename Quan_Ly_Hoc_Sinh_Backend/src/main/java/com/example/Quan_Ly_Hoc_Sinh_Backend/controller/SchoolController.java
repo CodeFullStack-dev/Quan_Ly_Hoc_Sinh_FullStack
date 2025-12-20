@@ -27,7 +27,7 @@ public class SchoolController {
     }
 
     @PostMapping
-    public ResponseEntity<SchoolResponse> getByID(@RequestBody SchoolRequest request) {
+    public ResponseEntity<SchoolResponse> createSchool(@RequestBody SchoolRequest request) {
         return ResponseEntity.ok(schoolService.createSchool(request));
     }
 

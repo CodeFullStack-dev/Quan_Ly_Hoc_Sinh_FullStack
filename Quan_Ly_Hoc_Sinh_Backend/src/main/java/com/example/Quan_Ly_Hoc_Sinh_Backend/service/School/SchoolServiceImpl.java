@@ -35,6 +35,8 @@ public class SchoolServiceImpl implements SchoolService{
     public SchoolResponse getSchoolById(Long id) {
         School school = schoolRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy trường với ID: " + id));
+
+
         return schoolMapper.toResponse(school);
     }
 

@@ -1,4 +1,4 @@
-package com.example.Quan_Ly_Hoc_Sinh_Backend.config;
+package com.example.Quan_Ly_Hoc_Sinh_Backend.security;
 
 import com.example.Quan_Ly_Hoc_Sinh_Backend.service.EmployeeDetailsService;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.service.JWT.JwtFilter;
@@ -71,7 +71,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/auth/**").permitAll()
 
                         // ADMIN
-                        .requestMatchers("/schools/**", "/employees/**").hasAuthority(ROLE_ADMIN.name())
+                        .requestMatchers("/schools/**", "/employees/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
 
                         // ADMIN & STAFF
                         .requestMatchers("/classes/**", "/subjects/**").hasAnyAuthority(ROLE_ADMIN.name(), ROLE_STAFF.name())

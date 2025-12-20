@@ -11,6 +11,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     // Rất quan trọng cho Spring Security
     Optional<Employee> findByUsername(String username);
 
-    // Tìm kiếm giáo viên theo vai trò (ví dụ: tất cả giáo viên)
-    List<Employee> findByRoles_Name(Erole roleName);
+    // Tìm kiếm giáo viên theo vai trò (ví dụ: tất cả giáo viên) dùng Distinct để tránh trùng lặp dữ liệu trả về
+    List<Employee> findDistinctByRoles_Name(Erole roleName);
 }

@@ -2,8 +2,8 @@ package com.example.Quan_Ly_Hoc_Sinh_Backend.controller;
 
 
 
-import com.example.Quan_Ly_Hoc_Sinh_Backend.dto.JwtResponse;
-import com.example.Quan_Ly_Hoc_Sinh_Backend.dto.LoginRequest;
+import com.example.Quan_Ly_Hoc_Sinh_Backend.security.JwtResponse;
+import com.example.Quan_Ly_Hoc_Sinh_Backend.security.LoginRequest;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Entity.Employee;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.service.JWT.JwtService;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.service.EmployeeDetailsService;

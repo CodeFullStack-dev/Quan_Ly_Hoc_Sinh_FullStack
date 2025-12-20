@@ -30,7 +30,7 @@ public class JwtService {
     @Autowired
     private EmployeeDetailsService employeeDetailsService;
 
-    private static final long EXPIRATION_TIME = 30 * 60 * 1000;
+    private static final long EXPIRATION_TIME = 24 * 60 * 60 * 1000;
 
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();

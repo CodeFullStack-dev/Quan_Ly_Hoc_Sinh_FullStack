@@ -1,6 +1,7 @@
 package com.example.Quan_Ly_Hoc_Sinh_Backend.service.JWT;
 
 import com.example.Quan_Ly_Hoc_Sinh_Backend.service.EmployeeDetailsService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +26,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        try{
+        try {
             String authHeader = request.getHeader("Authorization");
             String token = null;
             String username = null;
@@ -36,19 +37,24 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
                 UserDetails userDetails = employeeDetailsService.loadUserByUsername(username);
 
                 if (jwtService.validateToken(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
-            filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException e) {
+            System.out.println("Lỗi tại JwtFilter: Token đã hết hạn!");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token da het han, vui long dang nhap lai.");
+            return; // Dừng request tại đây, không cho đi tiếp
         } catch (Exception e) {
-            // Log lỗi ở đây nếu cần thiết
+            System.out.println("Lỗi tại JwtFilter: " + e.getMessage());
         }
+        // PHẢI ĐƯA DÒNG NÀY RA NGOÀI try-catch để request luôn được đi tiếp
+        filterChain.doFilter(request, response);
     }
 }

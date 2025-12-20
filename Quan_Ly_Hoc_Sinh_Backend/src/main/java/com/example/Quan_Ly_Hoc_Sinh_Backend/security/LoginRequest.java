@@ -1,4 +1,4 @@
-package com.example.Quan_Ly_Hoc_Sinh_Backend.dto;
+package com.example.Quan_Ly_Hoc_Sinh_Backend.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
