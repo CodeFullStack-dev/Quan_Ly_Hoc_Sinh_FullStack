@@ -23,7 +23,7 @@ public class StudentController {
     }
 
     //Cập nhật thông tin các nhân (PUT)
-    @PutMapping("/update")
+    @PutMapping("/update/{id}")
     public ResponseEntity<StudentResponse> update(@RequestBody StudentRequest request) {
         return ResponseEntity.ok(studentService.updateStudent(request));
     }
@@ -39,7 +39,7 @@ public class StudentController {
     }
 
     // Xóa học sinh
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         studentService.deleteStudent(id);
         return ResponseEntity.ok("Đã xóa học sinh thành công");

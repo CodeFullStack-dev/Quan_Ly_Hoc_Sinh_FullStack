@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class SubjectRequest {
     private String subjectCode;
     private String subjectName;
+    private Long schoolId;
 }

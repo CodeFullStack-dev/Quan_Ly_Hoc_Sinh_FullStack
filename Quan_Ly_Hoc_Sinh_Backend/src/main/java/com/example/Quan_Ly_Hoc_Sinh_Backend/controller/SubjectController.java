@@ -16,22 +16,22 @@ public class SubjectController {
     @Autowired
     private SubjectService subjectService;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<SubjectResponse> create(@RequestBody SubjectRequest request) {
         return ResponseEntity.ok(subjectService.createSubject(request));
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<SubjectResponse>> getAll() {
         return ResponseEntity.ok(subjectService.getAllSubjects());
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<SubjectResponse> update(@PathVariable Long id, @RequestBody SubjectRequest request) {
         return ResponseEntity.ok(subjectService.updateSubject(id, request));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         subjectService.deleteSubject(id);
         return ResponseEntity.ok("Xóa môn học thành công");

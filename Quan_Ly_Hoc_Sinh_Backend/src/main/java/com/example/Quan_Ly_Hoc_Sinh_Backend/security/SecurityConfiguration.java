@@ -77,7 +77,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/classes/**", "/subjects/**").hasAnyAuthority(ROLE_ADMIN.name(), ROLE_STAFF.name())
 
                         // TEACHER
-                        .requestMatchers("/scores/**", "/lesson-logs/**").hasAuthority(ROLE_TEACHER.name())
+                        .requestMatchers("/scores/**", "/lesson-logs/**").hasAnyAuthority(ROLE_TEACHER.name(), ROLE_STAFF.name())
 
                         // Yêu cầu xác thực cho tất cả request còn lại
                         .anyRequest().authenticated()

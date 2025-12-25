@@ -16,7 +16,7 @@ public class SchoolController {
     @Autowired
     private SchoolService schoolService;
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<SchoolResponse>> getAll() {
         return ResponseEntity.ok(schoolService.getAllSchools());
     }
@@ -31,12 +31,12 @@ public class SchoolController {
         return ResponseEntity.ok(schoolService.createSchool(request));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("update/{id}")
     public ResponseEntity<SchoolResponse> update(@PathVariable Long id, @RequestBody SchoolRequest request) {
         return ResponseEntity.ok(schoolService.updateSchool(id, request));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         schoolService.deleteSchool(id);
         return ResponseEntity.noContent().build();

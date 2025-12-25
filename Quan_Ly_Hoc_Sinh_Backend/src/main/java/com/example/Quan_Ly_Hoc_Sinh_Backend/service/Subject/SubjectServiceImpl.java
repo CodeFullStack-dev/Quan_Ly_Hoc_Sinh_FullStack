@@ -3,7 +3,9 @@ package com.example.Quan_Ly_Hoc_Sinh_Backend.service.Subject;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.dto.SubjectDTOs.SubjectRequest;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.dto.SubjectDTOs.SubjectResponse;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.mapper.SubjectMapper;
+import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Entity.School;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Entity.Subject;
+import com.example.Quan_Ly_Hoc_Sinh_Backend.repository.SchoolRepository;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.repository.SubjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Autowired
     private  SubjectMapper subjectMapper;
+    @Autowired
+    private SchoolRepository schoolRepository;
 
     @Override
     @Transactional
@@ -28,6 +32,11 @@ public class SubjectServiceImpl implements SubjectService {
             throw new RuntimeException("Mã môn học đã tồn tại: " + request.getSubjectCode());
         }
         Subject subject = subjectMapper.toEntity(request);
+
+        School school = schoolRepository.findById(request.getSchoolId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy trường học có ID: " + request.getSchoolId()));
+        subject.setSchool(school);
+
         return subjectMapper.toResponse(subjectRepository.save(subject));
     }
 
