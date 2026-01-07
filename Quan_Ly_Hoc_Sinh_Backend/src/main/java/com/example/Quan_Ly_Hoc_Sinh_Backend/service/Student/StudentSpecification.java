@@ -25,7 +25,12 @@ public class StudentSpecification {
 
             // Lọc theo giới tính
             if (gender != null && !gender.isEmpty()) {
-                predicates.add(cb.equal(root.get("gender"), EGender.valueOf(gender)));
+                try {
+                    EGender genderEnum = EGender.valueOf(gender.toUpperCase());
+                    predicates.add(cb.equal(root.get("gender"), genderEnum));
+                } catch (IllegalArgumentException e) {
+                    // Bỏ qua hoặc log lỗi nếu giới tính truyền lên không hợp lệ
+                }
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));

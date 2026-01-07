@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "student_parent")
+@Table(name = "student_parent", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"student_id", "parent_id"})
+})
 public class StudentParent {
 
     @Id

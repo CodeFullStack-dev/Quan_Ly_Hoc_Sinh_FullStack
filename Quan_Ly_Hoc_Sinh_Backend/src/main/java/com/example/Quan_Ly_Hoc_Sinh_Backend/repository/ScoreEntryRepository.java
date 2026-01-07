@@ -14,4 +14,11 @@ public interface ScoreEntryRepository extends JpaRepository<ScoreEntry, Long> {
     // Tìm điểm của một học sinh theo loại kiểm tra
     List<ScoreEntry> findByStudentIdAndScoreType(Long studentId, EScoreType scoreType);
 
+    // Phương thức này giúp Service lọc đúng các đầu điểm của Kỳ 1 năm 2024 chẳng hạn.
+    List<ScoreEntry> findByStudentIdAndSubjectIdAndSemesterAndSchoolYear(
+            Long studentId,
+            Long subjectId,
+            ESemester semester,
+            String schoolYear
+    );
 }

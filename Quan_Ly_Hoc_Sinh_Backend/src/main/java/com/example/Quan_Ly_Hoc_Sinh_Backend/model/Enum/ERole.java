@@ -1,6 +1,6 @@
 package com.example.Quan_Ly_Hoc_Sinh_Backend.model.Enum;
 
-public enum Erole {
+public enum ERole {
     ROLE_ADMIN,
     ROLE_STAFF, // GiaoVu
     ROLE_TEACHER,

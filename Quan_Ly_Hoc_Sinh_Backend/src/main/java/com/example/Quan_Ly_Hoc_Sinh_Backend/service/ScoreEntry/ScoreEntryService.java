@@ -11,9 +11,6 @@ public interface ScoreEntryService {
     ScoreEntryResponse updateScore(Long id, ScoreEntryRequest request);
     void deleteScore(Long id, ESemester semester, String schoolYear);
 
-    // Tìm theo ID (Long)
-    List<ScoreEntryResponse> getScoresByStudentAndSubject(Long studentId, Long subjectId);
-
     // THÊM MỚI: Tìm theo Mã (String)
     List<ScoreEntryResponse> getScoresByStudentCodeAndSubjectCode(String studentCode, String subjectCode);
 }

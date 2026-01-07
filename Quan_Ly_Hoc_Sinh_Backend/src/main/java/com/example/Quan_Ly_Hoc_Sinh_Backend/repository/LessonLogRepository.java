@@ -12,4 +12,6 @@ public interface LessonLogRepository extends JpaRepository<LessonLog, Long> {
 
     // Lấy tất cả bài giảng của một giáo viên
     List<LessonLog> findByTeacherId(Long teacherId);
+
+    List<LessonLog> findBySchoolClassId(Long classId);
 }

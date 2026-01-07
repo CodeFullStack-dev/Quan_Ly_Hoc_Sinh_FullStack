@@ -1,6 +1,6 @@
 package com.example.Quan_Ly_Hoc_Sinh_Backend.model.Entity;
 
-import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Enum.Erole;
+import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Enum.ERole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,5 +19,5 @@ public class Role {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, unique = true, nullable = false)
-    private Erole name; // Tên vai trò (e.g., ROLE_ADMIN)
+    private ERole name; // Tên vai trò (e.g., ROLE_ADMIN)
 }

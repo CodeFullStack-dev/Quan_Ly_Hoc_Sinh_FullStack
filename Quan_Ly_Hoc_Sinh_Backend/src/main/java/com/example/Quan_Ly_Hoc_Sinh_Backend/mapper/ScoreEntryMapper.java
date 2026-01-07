@@ -14,6 +14,8 @@ public class ScoreEntryMapper {
         response.setScoreValue(entity.getScoreValue());
         response.setScoreType(entity.getScoreType()); // Đảm bảo DTO cũng là kiểu EScoreType
         response.setTestDate(entity.getTestDate());
+        response.setSemester(entity.getSemester());
+        response.setSchoolYear(entity.getSchoolYear());
 
         if (entity.getStudent() != null) response.setStudentName(entity.getStudent().getFullName());
         if (entity.getSubject() != null) response.setSubjectName(entity.getSubject().getSubjectName());
@@ -30,4 +32,6 @@ public class ScoreEntryMapper {
         entity.setTestDate(request.getTestDate());
         return entity;
     }
+
+
 }

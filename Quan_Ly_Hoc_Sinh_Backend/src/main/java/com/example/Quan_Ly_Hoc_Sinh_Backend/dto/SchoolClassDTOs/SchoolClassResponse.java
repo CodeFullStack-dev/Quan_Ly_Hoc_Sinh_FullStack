@@ -14,5 +14,4 @@ public class SchoolClassResponse {
     private String schoolYear;
     private String schoolName;
     private String teacherName;
-    private String schoolClassId;
 }

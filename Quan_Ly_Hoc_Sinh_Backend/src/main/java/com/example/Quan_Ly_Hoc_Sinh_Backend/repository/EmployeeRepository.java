@@ -1,7 +1,7 @@
 package com.example.Quan_Ly_Hoc_Sinh_Backend.repository;
 
 import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Entity.Employee;
-import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Enum.Erole;
+import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Enum.ERole;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -12,5 +12,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<Employee> findByUsername(String username);
 
     // Tìm kiếm giáo viên theo vai trò (ví dụ: tất cả giáo viên) dùng Distinct để tránh trùng lặp dữ liệu trả về
-    List<Employee> findDistinctByRoles_Name(Erole roleName);
+    List<Employee> findDistinctByRoles_Name(ERole roleName);
 }

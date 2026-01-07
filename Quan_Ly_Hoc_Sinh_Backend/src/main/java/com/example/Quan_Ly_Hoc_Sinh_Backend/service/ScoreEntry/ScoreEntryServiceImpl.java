@@ -114,9 +114,4 @@ public class ScoreEntryServiceImpl implements ScoreEntryService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<ScoreEntryResponse> getScoresByStudentAndSubject(Long studentId, Long subjectId) {
-        return scoreEntryRepository.findByStudentIdAndSubjectId(studentId, subjectId)
-                .stream().map(scoreEntryMapper::toResponse).collect(Collectors.toList());
-    }
 }

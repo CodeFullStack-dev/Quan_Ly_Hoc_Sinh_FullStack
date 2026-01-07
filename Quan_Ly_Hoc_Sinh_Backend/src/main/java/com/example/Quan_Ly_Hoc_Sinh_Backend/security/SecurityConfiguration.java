@@ -23,7 +23,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.example.Quan_Ly_Hoc_Sinh_Backend.model.Enum.Erole.*;
+import static com.example.Quan_Ly_Hoc_Sinh_Backend.model.Enum.ERole.*;
 
 
 @Configuration
@@ -63,8 +63,6 @@ public class SecurityConfiguration {
 
                 .authenticationProvider(authenticationProvider())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(config -> config
                         // Công khai

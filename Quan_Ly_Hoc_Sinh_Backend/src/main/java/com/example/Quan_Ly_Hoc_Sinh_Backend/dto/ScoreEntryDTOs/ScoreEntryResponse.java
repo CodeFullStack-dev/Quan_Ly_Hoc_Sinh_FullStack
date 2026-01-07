@@ -1,6 +1,7 @@
 package com.example.Quan_Ly_Hoc_Sinh_Backend.dto.ScoreEntryDTOs;
 
 import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Enum.EScoreType;
+import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Enum.ESemester;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,4 +20,7 @@ public class ScoreEntryResponse {
     private EScoreType scoreType;
     private BigDecimal scoreValue;
     private Date testDate;
+
+    private ESemester semester;
+    private String schoolYear;
 }

@@ -39,7 +39,8 @@ public class GradeBookServiceImpl implements GradeBookService {
     @Override
     @Transactional
     public void calculateAndSaveAverage(Long studentId, Long subjectId, ESemester semester, String schoolYear) {
-        List<ScoreEntry> scores = scoreEntryRepository.findByStudentIdAndSubjectId(studentId, subjectId);
+        List<ScoreEntry> scores = scoreEntryRepository.findByStudentIdAndSubjectIdAndSemesterAndSchoolYear(
+                studentId, subjectId, semester, schoolYear);
 
         // Tìm bản ghi GradeBook hiện tại
         GradeBook gradeBook = gradeBookRepository

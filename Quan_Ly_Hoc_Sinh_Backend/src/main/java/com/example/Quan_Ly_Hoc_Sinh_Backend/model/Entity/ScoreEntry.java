@@ -1,6 +1,7 @@
 package com.example.Quan_Ly_Hoc_Sinh_Backend.model.Entity;
 
 import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Enum.EScoreType;
+import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Enum.ESemester;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,6 +31,14 @@ public class ScoreEntry {
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "semester", nullable = false)
+    private ESemester semester;
+
+    @Column(name = "school_year", nullable = false, length = 9)
+    private String schoolYear;
+    // -------------------------
+
     // Loại bài kiểm tra (sử dụng Enum)
     @Enumerated(EnumType.STRING)
     @Column(name = "score_type", nullable = false)
@@ -47,4 +56,9 @@ public class ScoreEntry {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id")
     private Employee teacher;
+
+    // Trong ScoreEntry.java
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "grade_book_id") // Thay vì quản lý student_id/subject_id rời rạc
+    private GradeBook gradeBook;
 }

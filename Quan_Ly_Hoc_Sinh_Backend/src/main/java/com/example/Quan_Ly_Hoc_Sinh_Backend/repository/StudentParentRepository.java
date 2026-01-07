@@ -11,4 +11,6 @@ public interface StudentParentRepository extends JpaRepository<StudentParent, Lo
 
     // Tìm kiếm học sinh liên quan đến một phụ huynh
     List<StudentParent> findByParentId(Long parentId);
+
+    void deleteByStudentIdAndParentId(Long studentId, Long parentId);
 }

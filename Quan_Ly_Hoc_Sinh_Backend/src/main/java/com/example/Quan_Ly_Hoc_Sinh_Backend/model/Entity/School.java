@@ -34,6 +34,6 @@ public class School {
     @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Employee> employees;
     // Mối quan hệ 1-N: Một trường có nhiều lớp
-    // @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private List<SchoolClass> classes;
+    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SchoolClass> classes;
 }
