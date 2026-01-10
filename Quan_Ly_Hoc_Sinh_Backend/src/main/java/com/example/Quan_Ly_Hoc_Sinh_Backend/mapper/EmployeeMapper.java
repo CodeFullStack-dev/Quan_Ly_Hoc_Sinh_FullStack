@@ -3,6 +3,7 @@ package com.example.Quan_Ly_Hoc_Sinh_Backend.mapper;
 
 import com.example.Quan_Ly_Hoc_Sinh_Backend.dto.EmployeeDTOs.EmployeeRequest;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.dto.EmployeeDTOs.EmployeeResponse;
+import com.example.Quan_Ly_Hoc_Sinh_Backend.dto.EmployeeDTOs.ProfileResponse;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Entity.Employee;
 import org.springframework.stereotype.Component;
 
@@ -32,5 +33,22 @@ public class EmployeeMapper {
         employee.setEmail(request.getEmail());
         employee.setPhoneNumber(request.getPhoneNumber());
         return employee;
+    }
+
+    public ProfileResponse toProfileResponse(Employee employee) {
+        if (employee == null) return null;
+
+        ProfileResponse response = new ProfileResponse();
+        response.setId(employee.getId());
+        response.setUsername(employee.getUsername());
+        response.setFullName(employee.getFullName());
+        response.setEmail(employee.getEmail());
+
+        // Chuyển đổi Set<Role> thành Set<String> (ví dụ: ["ROLE_ADMIN", "ROLE_TEACHER"])
+
+        response.setRoles(employee.getRoles().stream()
+                .map(role -> role.getName().name()).collect(Collectors.toSet()));
+
+        return response;
     }
 }

@@ -1,8 +1,11 @@
 package com.example.Quan_Ly_Hoc_Sinh_Backend.controller;
 
+import com.example.Quan_Ly_Hoc_Sinh_Backend.dto.EmployeeDTOs.ProfileResponse;
+import com.example.Quan_Ly_Hoc_Sinh_Backend.mapper.EmployeeMapper;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.security.JwtResponse;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.security.LoginRequest;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Entity.Employee;
+import com.example.Quan_Ly_Hoc_Sinh_Backend.service.Employee.EmployeeService;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.service.JWT.JwtService;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.service.EmployeeDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,11 @@ public class AuthController {
 
     @Autowired
     private EmployeeDetailsService employeeDetailsService;
+
+    @Autowired
+    private EmployeeService employeeService;
+    @Autowired
+    private EmployeeMapper employeeMapper;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
@@ -56,5 +64,14 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Sai tên đăng nhập hoặc mật khẩu!");
         }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ProfileResponse> getCurrentUser(Authentication authentication) {
+        // Spring Security tự động lấy thông tin từ Token và bỏ vào đối tượng authentication
+        String username = authentication.getName();
+        Employee employee = employeeDetailsService.findByUsername(username);
+
+        return ResponseEntity.ok(employeeMapper.toProfileResponse(employee));
     }
 }

@@ -65,19 +65,22 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(config -> config
-                        // Công khai
-                        .requestMatchers("/auth/**").permitAll()
+                        // Chỉ API login và các API public khác (nếu có) là không cần token
+                        .requestMatchers("/auth/login").permitAll()
 
-                        // ADMIN
-                        .requestMatchers("/schools/**", "/employees/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
+                        // API /me PHẢI yêu cầu xác thực để JwtFilter trích xuất thông tin người dùng
+                        .requestMatchers("/auth/me").authenticated()
 
-                        // ADMIN & STAFF
-                        .requestMatchers("/classes/**", "/subjects/**").hasAnyAuthority(ROLE_ADMIN.name(), ROLE_STAFF.name())
+                        // ADMIN: Quản lý hạ tầng và nhân sự
+                        .requestMatchers("/schools/**", "/employees/**").hasAnyAuthority("ROLE_ADMIN")
 
-                        // TEACHER
-                        .requestMatchers("/scores/**", "/lesson-logs/**").hasAnyAuthority(ROLE_TEACHER.name(), ROLE_STAFF.name())
+                        // ADMIN & STAFF: Quản lý vận hành lớp học
+                        .requestMatchers("/classes/**", "/subjects/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
 
-                        // Yêu cầu xác thực cho tất cả request còn lại
+                        // TEACHER, STAFF, ADMIN: Quản lý chuyên môn
+                        .requestMatchers("/scores/**", "/lesson-logs/**", "/grade-books/**").hasAnyAuthority("ROLE_TEACHER", "ROLE_STAFF", "ROLE_ADMIN")
+
+                        // Tất cả các yêu cầu khác đều phải đăng nhập
                         .anyRequest().authenticated()
                 );
 
