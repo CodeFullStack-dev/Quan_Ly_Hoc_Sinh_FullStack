@@ -3,8 +3,10 @@ package com.example.Quan_Ly_Hoc_Sinh_Backend.security;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.service.EmployeeDetailsService;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.service.JWT.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -30,6 +32,9 @@ import static com.example.Quan_Ly_Hoc_Sinh_Backend.model.Enum.ERole.*;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
+    @Value("${frontend_url:http://localhost:3000}")
+    private String frontend_url;
+
     @Autowired
     private JwtFilter jwtFilter;
 
@@ -44,47 +49,36 @@ public class SecurityConfiguration {
     /**
      * KHẮC PHỤC LỖI CONSTRUCTOR: Truyền EmployeeDetailsService vào constructor
      */
-    @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        // SỬA LỖI Ở ĐÂY: Dùng constructor có 1 tham số
+        // Truyền trực tiếp service vào constructor
         DaoAuthenticationProvider dap = new DaoAuthenticationProvider(employeeDetailsService);
 
-        // Chỉ cần set PasswordEncoder
         dap.setPasswordEncoder(passwordEncoder());
         return dap;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
-
-                .authenticationProvider(authenticationProvider())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
+                .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(config -> config
-                        // Chỉ API login và các API public khác (nếu có) là không cần token
-                        .requestMatchers("/auth/login").permitAll()
+                        // Sử dụng mảng từ file Endpoints
+                        .requestMatchers(HttpMethod.POST, Endpoints.PUBLIC_POST).permitAll()
+                        .requestMatchers(HttpMethod.GET, Endpoints.PUBLIC_GET).permitAll()
 
-                        // API /me PHẢI yêu cầu xác thực để JwtFilter trích xuất thông tin người dùng
+                        // Yêu cầu xác thực cụ thể cho /me
                         .requestMatchers("/auth/me").authenticated()
 
-                        // ADMIN: Quản lý hạ tầng và nhân sự
-                        .requestMatchers("/schools/**", "/employees/**").hasAnyAuthority("ROLE_ADMIN")
+                        // Phân quyền dựa trên mảng Endpoint
+                        .requestMatchers(Endpoints.ADMIN_ENDPOINT).hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(Endpoints.SHARED_MANAGEMENT).hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF", "ROLE_TEACHER")
 
-                        // ADMIN & STAFF: Quản lý vận hành lớp học
-                        .requestMatchers("/classes/**", "/subjects/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
-
-                        // TEACHER, STAFF, ADMIN: Quản lý chuyên môn
-                        .requestMatchers("/scores/**", "/lesson-logs/**", "/grade-books/**").hasAnyAuthority("ROLE_TEACHER", "ROLE_STAFF", "ROLE_ADMIN")
-
-                        // Tất cả các yêu cầu khác đều phải đăng nhập
                         .anyRequest().authenticated()
                 );
 
-        // Thêm JWT Filter
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -93,10 +87,9 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Thay "*" bằng địa chỉ cụ thể của Frontend (ví dụ http://localhost:3000)
-        // Hoặc dùng setAllowedOriginPatterns nếu muốn linh hoạt hơn
-        config.setAllowedOriginPatterns(List.of("*"));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Sử dụng biến frontend_url đã inject thay vì dùng "*"
+        config.setAllowedOrigins(List.of(frontend_url));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 

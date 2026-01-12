@@ -42,6 +42,9 @@ public class Parent {
     @Column(name = "occupation", length = 100)
     private String occupation; // Nghề nghiệp
 
+    @Column(name = "address", length = 255)
+    private String address; // Thêm trường này nếu muốn lưu địa chỉ thường trú
+
     // Mối quan hệ N-M (Phụ huynh - Học sinh): Được quản lý bởi Entity trung gian StudentParent
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<StudentParent> childrenLinks;
