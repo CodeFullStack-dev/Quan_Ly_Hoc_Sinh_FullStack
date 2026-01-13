@@ -26,6 +26,7 @@ public class Endpoints {
             "/scores/**",
             "/lesson-logs/**",
             "/grade-books/**",
-            "/parents/**"
+            "/parents/**",
+            "/academic-records/**"
     };
 }
