@@ -5,6 +5,7 @@ import com.example.Quan_Ly_Hoc_Sinh_Backend.dto.AcademicRecordDTOs.AcademicRecor
 import com.example.Quan_Ly_Hoc_Sinh_Backend.mapper.AcademicRecordMapper;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Entity.AcademicRecord;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Entity.GradeBook;
+import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Entity.Student;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.repository.AcademicRecordRepository;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.repository.GradeBookRepository;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.repository.StudentRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,65 +34,111 @@ public class AcademicRecordServiceImpl implements AcademicRecordService {
     private AcademicRecordMapper academicRecordMapper;
 
     @Override
-    public AcademicRecordResponse generateOrUpdateRecord(AcademicRecordRequest request) {
-        AcademicRecord academicRecord = academicRecordRepository
-                .findByStudentIdAndSchoolYear(request.getStudentId(), request.getSchoolYear())
-                .orElseGet(() -> {
-                    AcademicRecord newRecord = academicRecordMapper.toEntity(request);
-                    newRecord.setStudent(studentRepository.findById(request.getStudentId())
-                            .orElseThrow(() -> new RuntimeException("Không tìm thấy học sinh")));
-                    return newRecord;
-                });
+    @Transactional
+    public AcademicRecordResponse createAcademicRecord(AcademicRecordRequest request) {
+        // 1. Tìm Student bằng Code
+        Student student = studentRepository.findByStudentCode(request.getStudentCode())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy học sinh với mã: " + request.getStudentCode()));
 
-        //Cập nhật thông tin từ request
-        academicRecord.setConduct(request.getConduct());
-        academicRecord.setHomeroomTeacherReview(request.getHomeroomTeacherReview());
-        academicRecord.setParentFeedback(request.getParentFeedback());
-        academicRecord.setStatus(request.getStatus());
+        // 2. Kiểm tra tồn tại
+        academicRecordRepository.findByStudentIdAndSchoolYear(student.getId(), request.getSchoolYear())
+                .ifPresent(s -> { throw new RuntimeException("Học bạ cho năm học này đã tồn tại!"); });
 
-        // LOGIC TỔNG HỢP: Lấy tất cả GradeBook của học sinh trong năm học đó
+        // 3. Xử lý
+        AcademicRecord record = academicRecordMapper.toEntity(request);
+        record.setStudent(student);
+
+        // Gọi hàm tính tổng điểm thay vì hàm calculateRating trống
+        calculateTotalScores(record);
+
+        return academicRecordMapper.toResponse(academicRecordRepository.save(record));
+    }
+
+    @Override
+    @Transactional
+    public AcademicRecordResponse updateAcademicRecord(AcademicRecordRequest request) {
+        // Cần tìm studentId từ code trước
+        Student student = studentRepository.findByStudentCode(request.getStudentCode())
+                .orElseThrow(() -> new RuntimeException("Mã học sinh không tồn tại"));
+
+        // Tìm học bạ dựa trên ID học sinh và năm học
+        AcademicRecord existing = academicRecordRepository.findByStudentIdAndSchoolYear(student.getId(), request.getSchoolYear())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy học bạ để cập nhật"));
+
+        existing.setConduct(request.getConduct());
+        existing.setHomeroomTeacherReview(request.getHomeroomTeacherReview());
+        existing.setParentFeedback(request.getParentFeedback());
+        existing.setStatus(request.getStatus());
+
+        // Sử dụng hàm tính toán tổng điểm
+        calculateTotalScores(existing);
+
+        return academicRecordMapper.toResponse(academicRecordRepository.save(existing));
+    }
+
+    @Override
+    @Transactional
+    public AcademicRecordResponse syncGrades(AcademicRecordRequest request) {
+        Student student = studentRepository.findByStudentCode(request.getStudentCode())
+                .orElseThrow(() -> new RuntimeException("Mã học sinh không tồn tại"));
+
+        AcademicRecord record = academicRecordRepository.findByStudentIdAndSchoolYear(student.getId(), request.getSchoolYear())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy học bạ để đồng bộ điểm"));
+
+        calculateTotalScores(record);
+        return academicRecordMapper.toResponse(academicRecordRepository.save(record));
+    }
+    // --- TÌM KIẾM LỊCH SỬ THEO CODE ---
+    @Override
+    @Transactional(readOnly = true)
+    public List<AcademicRecordResponse> getStudentHistory(String studentCode) {
+        Student student = studentRepository.findByStudentCode(studentCode)
+                .orElseThrow(() -> new RuntimeException("Mã học sinh không tồn tại"));
+
+        return academicRecordRepository.findByStudentIdOrderBySchoolYearDesc(student.getId())
+                .stream().map(academicRecordMapper::toResponse).collect(Collectors.toList());
+    }
+
+    // --- TÌM KIẾM CHI TIẾT THEO CODE + NĂM ---
+    @Override
+    @Transactional(readOnly = true)
+    public AcademicRecordResponse getRecordByStudentCodeAndYear(String studentCode, String schoolYear) {
+        Student student = studentRepository.findByStudentCode(studentCode)
+                .orElseThrow(() -> new RuntimeException("Mã học sinh không tồn tại"));
+
+        AcademicRecord record = academicRecordRepository.findByStudentIdAndSchoolYear(student.getId(), schoolYear)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy học bạ năm " + schoolYear));
+        return academicRecordMapper.toResponse(record);
+    }
+
+    // --- XÓA THEO CODE + NĂM ---
+    @Override
+    @Transactional
+    public void deleteRecordByCode(String studentCode, String schoolYear) {
+        Student student = studentRepository.findByStudentCode(studentCode)
+                .orElseThrow(() -> new RuntimeException("Mã học sinh không tồn tại"));
+
+        AcademicRecord record = academicRecordRepository.findByStudentIdAndSchoolYear(student.getId(), schoolYear)
+                .orElseThrow(() -> new RuntimeException("Học bạ không tồn tại để xóa"));
+
+        academicRecordRepository.delete(record);
+    }
+    // --- HÀM TÍNH TOÁN ---
+    private void calculateTotalScores(AcademicRecord record) {
         List<GradeBook> subjectGrades = gradeBookRepository
-                .findByStudentIdAndSchoolYear(request.getStudentId(), request.getSchoolYear());
+                .findByStudentIdAndSchoolYear(record.getStudent().getId(), record.getSchoolYear());
 
         if (!subjectGrades.isEmpty()) {
             BigDecimal totalScore = subjectGrades.stream()
                     .map(gb -> gb.getAverageScore() != null ? gb.getAverageScore() : BigDecimal.ZERO)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            BigDecimal avgYear = totalScore.divide(BigDecimal.valueOf(subjectGrades.size()), 2, BigDecimal.ROUND_HALF_UP);
-            academicRecord.setYearAverageScore(avgYear);
-            academicRecord.setAcademicPerformanceRating(calculateRating(avgYear));
+            BigDecimal avgYear = totalScore.divide(BigDecimal.valueOf(subjectGrades.size()), 2, RoundingMode.HALF_UP);
+            record.setYearAverageScore(avgYear);
+            record.setAcademicPerformanceRating(calculateRating(avgYear));
         }
-
-        return academicRecordMapper.toResponse(academicRecordRepository.save(academicRecord));
     }
 
-    // --- TÌM KIẾM ---
-    @Override
-    @Transactional(readOnly = true)
-    public List<AcademicRecordResponse> getStudentHistory(Long studentId) {
-        return academicRecordRepository.findByStudentIdOrderBySchoolYearDesc(studentId)
-                .stream().map(academicRecordMapper::toResponse).collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public AcademicRecordResponse getRecordByStudentAndYear(Long studentId, String schoolYear) {
-        AcademicRecord record = academicRecordRepository.findByStudentIdAndSchoolYear(studentId, schoolYear)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy học bạ năm " + schoolYear));
-        return academicRecordMapper.toResponse(record);
-    }
-
-    @Override
-    @Transactional
-    public void deleteRecord(Long id) {
-        if (!academicRecordRepository.existsById(id)) {
-            throw new RuntimeException("Học bạ không tồn tại");
-        }
-        academicRecordRepository.deleteById(id);
-    }
-
-    // Hàm phụ trợ tính xếp loại
     private String calculateRating(BigDecimal score) {
         double val = score.doubleValue();
         if (val >= 8.0) return "GIỎI";

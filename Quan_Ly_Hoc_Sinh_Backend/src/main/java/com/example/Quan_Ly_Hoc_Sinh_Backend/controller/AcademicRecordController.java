@@ -16,30 +16,44 @@ public class AcademicRecordController {
     @Autowired
     private AcademicRecordService academicRecordService;
 
-    // Tạo hoặc Cập nhật (Sync)
+    // 1. TẠO MỚI (Dùng POST /academic-records)
+    @PostMapping("/create")
+    public ResponseEntity<AcademicRecordResponse> create(@RequestBody AcademicRecordRequest request) {
+        return ResponseEntity.ok(academicRecordService.createAcademicRecord(request));
+    }
+
+    // 2. CẬP NHẬT (Dùng PUT /academic-records/update)
+    @PutMapping("/update")
+    public ResponseEntity<AcademicRecordResponse> update(@RequestBody AcademicRecordRequest request) {
+        return ResponseEntity.ok(academicRecordService.updateAcademicRecord(request));
+    }
+
+    // 3. ĐỒNG BỘ ĐIỂM (Dùng POST /academic-records/sync)
     @PostMapping("/sync")
-    public ResponseEntity<AcademicRecordResponse> saveOrUpdate(@RequestBody AcademicRecordRequest request) {
-        return ResponseEntity.ok(academicRecordService.generateOrUpdateRecord(request));
+    public ResponseEntity<AcademicRecordResponse> sync(@RequestBody AcademicRecordRequest request) {
+        return ResponseEntity.ok(academicRecordService.syncGrades(request));
     }
 
-    // Tìm kiếm lịch sử học tập của 1 học sinh
-    @GetMapping("/student/{studentId}")
-    public ResponseEntity<List<AcademicRecordResponse>> getHistory(@PathVariable Long studentId) {
-        return ResponseEntity.ok(academicRecordService.getStudentHistory(studentId));
+    // Tìm lịch sử theo mã học sinh: /academic-records/history/HS001
+    @GetMapping("/history/{studentCode}")
+    public ResponseEntity<List<AcademicRecordResponse>> getHistory(@PathVariable String studentCode) {
+        return ResponseEntity.ok(academicRecordService.getStudentHistory(studentCode));
     }
 
-    // Tìm kiếm học bạ cụ thể theo năm
-    @GetMapping("/search/{studentId}/{schoolYear}")
+    // Tìm chi tiết: /academic-records/detail/HS001/2025-2026
+    @GetMapping("/detail/{studentCode}/{schoolYear}")
     public ResponseEntity<AcademicRecordResponse> getOne(
-            @PathVariable Long studentId,
+            @PathVariable String studentCode,
             @PathVariable String schoolYear) {
-        return ResponseEntity.ok(academicRecordService.getRecordByStudentAndYear(studentId, schoolYear));
+        return ResponseEntity.ok(academicRecordService.getRecordByStudentCodeAndYear(studentCode, schoolYear));
     }
 
-    // Xóa học bạ
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
-        academicRecordService.deleteRecord(id);
+    // Xóa: /academic-records/delete/HS001/2025-2026
+    @DeleteMapping("/delete/{studentCode}/{schoolYear}")
+    public ResponseEntity<String> delete(
+            @PathVariable String studentCode,
+            @PathVariable String schoolYear) {
+        academicRecordService.deleteRecordByCode(studentCode, schoolYear);
         return ResponseEntity.ok("Xóa học bạ thành công");
     }
 }

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AcademicRecordRequest {
+    private String studentCode;
     private Long studentId;
     private String schoolYear;
     private EConduct conduct;
