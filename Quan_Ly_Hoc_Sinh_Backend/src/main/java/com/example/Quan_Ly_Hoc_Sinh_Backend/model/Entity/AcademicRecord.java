@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 // Đảm bảo mỗi Học sinh chỉ có 1 bản ghi Sổ học bạ cho 1 Niên khóa
 @Table(name = "academic_record", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"student_id", "school_year"})
+        @UniqueConstraint(columnNames = {"student_code", "school_year"})
 })
 public class AcademicRecord {
 
@@ -24,7 +24,11 @@ public class AcademicRecord {
 
     // Mối quan hệ N-1: Học sinh nào
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id", nullable = false)
+    @JoinColumn(
+            name = "student_code",
+            referencedColumnName = "student_code",
+            nullable = false
+    )
     private Student student;
 
     @Column(name = "school_year", nullable = false, length = 9)
