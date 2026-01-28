@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class StudentCardMapper {
-    public StudentCardResponse toStudentCardResponse(StudentCard studentCard) {
+    public StudentCardResponse toResponse(StudentCard studentCard) {
         if(studentCard == null) return null;
 
         StudentCardResponse response = new StudentCardResponse();
