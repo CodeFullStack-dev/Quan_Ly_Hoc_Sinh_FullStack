@@ -6,6 +6,7 @@ import com.example.Quan_Ly_Hoc_Sinh_Backend.mapper.AcademicRecordMapper;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Entity.AcademicRecord;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Entity.GradeBook;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Entity.Student;
+import com.example.Quan_Ly_Hoc_Sinh_Backend.model.Enum.EConduct;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.repository.AcademicRecordRepository;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.repository.GradeBookRepository;
 import com.example.Quan_Ly_Hoc_Sinh_Backend.repository.StudentRepository;
@@ -128,22 +129,53 @@ public class AcademicRecordServiceImpl implements AcademicRecordService {
         List<GradeBook> subjectGrades = gradeBookRepository
                 .findByStudentIdAndSchoolYear(record.getStudent().getId(), record.getSchoolYear());
 
-        if (!subjectGrades.isEmpty()) {
-            BigDecimal totalScore = subjectGrades.stream()
-                    .map(gb -> gb.getAverageScore() != null ? gb.getAverageScore() : BigDecimal.ZERO)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            BigDecimal avgYear = totalScore.divide(BigDecimal.valueOf(subjectGrades.size()), 2, RoundingMode.HALF_UP);
-            record.setYearAverageScore(avgYear);
-            record.setAcademicPerformanceRating(calculateRating(avgYear));
+        if (subjectGrades == null || subjectGrades.isEmpty()) {
+            record.setYearAverageScore(BigDecimal.ZERO);
+            record.setAcademicPerformanceRating("CHƯA CÓ ĐIỂM");
+            return;
         }
+
+        BigDecimal totalScore = subjectGrades.stream()
+                .map(gb -> gb.getAverageScore() != null ? gb.getAverageScore() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Sử dụng MathContext hoặc đặt scale rõ ràng
+        BigDecimal avgYear = totalScore.divide(new BigDecimal(subjectGrades.size()), 2, RoundingMode.HALF_UP);
+
+        record.setYearAverageScore(avgYear);
+        // Logic xếp loại có kết hợp hạnh kiểm
+        record.setAcademicPerformanceRating(calculateRating(avgYear, record.getConduct()));
     }
 
-    private String calculateRating(BigDecimal score) {
+    private String calculateRating(BigDecimal score, EConduct conduct) {
+
+        if (conduct == null) {
+            return "CHƯA XẾP LOẠI";
+        }
+
         double val = score.doubleValue();
-        if (val >= 8.0) return "GIỎI";
-        if (val >= 6.5) return "KHÁ";
-        if (val >= 5.0) return "TRUNG BÌNH";
+
+        // Hạnh kiểm WEAK → luôn YẾU
+        if (conduct == EConduct.WEAK) {
+            return "YẾU";
+        }
+
+        // EXCELLENT
+        if (val >= 8.0 && conduct == EConduct.EXCELLENT) {
+            return "GIỎI";
+        }
+
+        // GOOD hoặc EXCELLENT
+        if (val >= 6.5 && (conduct == EConduct.GOOD || conduct == EConduct.EXCELLENT)) {
+            return "KHÁ";
+        }
+
+        // AVERAGE trở lên
+        if (val >= 5.0 && conduct != EConduct.WEAK) {
+            return "TRUNG BÌNH";
+        }
+
         return "YẾU";
     }
+
 }
