@@ -32,7 +32,7 @@ import static com.example.Quan_Ly_Hoc_Sinh_Backend.model.Enum.ERole.*;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    @Value("${frontend_url:http://localhost:3000}")
+    @Value("${frontend_url:http://localhost:5173/}")
     private String frontend_url;
 
     @Autowired
