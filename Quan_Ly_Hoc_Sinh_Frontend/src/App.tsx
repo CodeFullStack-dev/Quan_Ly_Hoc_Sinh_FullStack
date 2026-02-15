@@ -1,20 +1,11 @@
-
-import './App.css'
+import AppRoutes from "./app/router/AppRoutes";
 
 function App() {
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-900">
-      <div className="p-10 bg-white rounded-xl shadow-2xl">
-        <h1 className="text-3xl font-bold text-blue-600 underline">
-          Tailwind đã hoạt động thành công!
-        </h1>
-        <p className="mt-4 text-gray-600">
-          Hệ thống Quản lý Học sinh - Frontend
-        </p>
-      </div>
-    </div>
-  );
+  return <AppRoutes />
 }
+
+console.log(import.meta.env.VITE_API_URL);
+
 
 export default App
 
